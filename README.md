@@ -9,7 +9,7 @@ zabbix-host.yaml - Ansible playbook для добавления хостов в 
 # Установка Zabbix агента на Ubuntu/Debian
 zabbix-agent.yaml - Ansible playbook для
 
-1. Установки Zabbix агента 
+1. Установки Zabbix агента на хосты из файла inventories/zabbix_hosts
 2. Установки утилит (sysstat, bc, lm-sensors, sudo) 
 3. Добавления пользователя Zabbix в список sudoers 
 4. Копирования папки scripts и zabbix_agetd.d со всем содержимым 
