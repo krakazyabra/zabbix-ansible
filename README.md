@@ -9,12 +9,13 @@ zabbix-host.yaml - Ansible playbook для добавления хостов в 
 # Установка Zabbix агента на Ubuntu/Debian
 zabbix-agent.yaml - Ansible playbook для
 
-а. Установки Zabbix агента
-б. Установки утилит (sysstat, bc, lm-sensors, sudo)
-в. Добавления пользователя Zabbix в список sudoers
-г. Копирования папки scripts и zabbix_agetd.d со всем содержимым
-д. Установки необходимых для шаблона [Linux Disk Performance Monitoring](https://share.zabbix.com/storage-devices/linux-disk-performance-monitoring) файлов (скрипт обнаружения дисков и userconfig)
+1. Установки Zabbix агента 
+2. Установки утилит (sysstat, bc, lm-sensors, sudo) 
+3. Добавления пользователя Zabbix в список sudoers 
+4. Копирования папки scripts и zabbix_agetd.d со всем содержимым 
+5. Установки необходимых для шаблона [Linux Disk Performance Monitoring](https://share.zabbix.com/storage-devices/linux-disk-performance-monitoring) файлов (скрипт обнаружения дисков и userconfig)  
 
+Использование:
 1. В файле zabbix-agent.yaml указать сервера Zabbix Сервера (или Zabbix Proxy)
 2. В папку scripts положить необходимые скрипы (обычно идут вместе с шаблоном)
 3. В папку zabbix_agetnd.d полопжить файлы конфигурации (обычно идут вместе с шаблоном)
