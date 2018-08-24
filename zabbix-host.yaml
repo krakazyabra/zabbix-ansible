@@ -1,0 +1,62 @@
+#!/usr/bin/ansible-playbook
+---
+
+- hosts: zabbix_hosts
+  gather_facts: no
+  vars:
+    zabbix_server_url: ##ZABBIX_URL##
+    user: ##USER_FOR_ANSIBLE##
+    password: ##PASS_FOR_ANSIBLE_USER##
+  tasks:
+
+    - set_fact:
+        zabbix_groups: "{{ zabbix_groups }} + {{ zabbix_add_groups }}"
+      when: zabbix_add_groups is defined
+
+    - set_fact:
+        zabbix_templates: "{{ zabbix_templates }} + {{ zabbix_add_templates }}"
+      when: zabbix_add_templates is defined
+
+##By default, when IP adresses use in inventories##
+    - set_fact:
+        ip: "{{ (ip | ipaddr(network_cidr))[0] }}"
+      when: ip is defined and ip is not string
+
+##Comment out if use hostnames in inventory (and comment previous section)##
+#    - set_fact:
+#        fqdn: "{{ inventory_hostname }}.your.domain"
+#    - set_fact:
+#        ip: "{{ lookup('dig', fqdn) }}"
+#      when: ip is defined and ip is not string
+    - debug:
+        var: ip
+
+    - local_action:
+        module: zabbix_host
+        server_url: "{{ zabbix_server_url }}"
+        login_user: "{{ user }}"
+        login_password: "{{ password }}"
+        host_name: "{{ host_name }}"
+        visible_name: "{{ inventory_hostname }}"
+        host_groups: "{{ zabbix_groups }}"
+        link_templates: "{{ zabbix_templates }}"
+        status: enabled
+        state: present
+        inventory_mode: automatic
+        interfaces:
+          - type: 1
+            main: 1
+            useip: 1
+            ip: "{{ ip }}"
+            dns: "{{ inventory_hostname }}"
+            port: 10050
+          - type: 2
+            main: 1
+            useip: 1
+            ip: "{{ ip }}"
+            dns: "{{ inventory_hostname }}"
+            port: 161
+      vars:
+        host_name: "{% if zabbix_use_ip is defined and zabbix_use_ip|bool == true %}{{ ip }}{% else %}{{ inventory_hostname }}{% endif %}"
+      when: ip is defined
+

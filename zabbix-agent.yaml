@@ -1,0 +1,85 @@
+#!/usr/bin/ansible-playbook
+---
+
+- name: Install zabbix agent
+  hosts: zabbix_hosts
+  tasks:
+
+    - apt:
+        deb: http://repo.zabbix.com/zabbix/3.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.4-1+xenial_all.deb
+      when: ansible_distribution == 'Ubuntu'
+      register: release
+
+    - apt:
+        deb: http://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
+      when: ansible_distribution == 'Debian'
+      register: release
+
+    - apt:
+        name: zabbix-agent
+        update_cache: yes
+      #when: release.changed
+
+    - lineinfile:
+        path: "/etc/zabbix/zabbix_agentd.conf"
+        regexp: "^{{ item.split('=')[0] }}="
+        line: "{{ item }}"
+      with_items:
+        - "Timeout=10"
+        - "Hostname=Zabbix server"
+        - "Server=zabbix-server.your.domain,zabbix-proxy.your.domain,192.168.100.50"
+        - "ServerActive=zabbix-server.your.domain,zabbix-proxy.your.domain,192.168.100.50"
+      notify:
+        - restart zabbix agent
+      #when: release.changed
+
+    - apt:
+        name: "{{ item }}"
+      with_items:
+        - sysstat
+        - bc
+      #when: release.changed
+
+    - lineinfile:
+        path: /etc/zabbix/zabbix_agentd.conf
+        state: absent
+        regexp: '^UserParameter='
+      notify:
+        - restart zabbix agent
+
+    - file:
+        path: "/etc/zabbix/zabbix_agentd.d/"
+        state: directory
+
+###Install utils
+    - apt:
+        name: lm-sensors
+    - apt:
+        name: sysstat
+    - apt:
+        name: bc
+    - apt:
+        name: sudo
+
+    - lineinfile:
+         path: "/etc/sudoers"
+         regexp: "^zabbix"
+         line: "zabbix ALL=NOPASSWD: ALL"
+
+    - copy:
+        src: "scripts/"
+        dest: "/etc/zabbix/scripts/"
+
+    - copy:
+        src: "zabbix_agentd.d/"
+        dest: "/etc/zabbix/zabbix_agentd.d/"
+
+    - service:
+        name: zabbix-agent
+        state: started
+
+  handlers:
+
+    - name: restart zabbix agent
+      command: /bin/systemctl restart zabbix-agent
+      #when: release.changed

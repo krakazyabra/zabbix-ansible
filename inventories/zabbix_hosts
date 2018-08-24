@@ -1,0 +1,13 @@
+[zabbix_group_1:vars]
+zabbix_groups='["Host group"]'
+zabbix_templates='["Template 1", "Template 2", "Template 3"]'
+
+[zabbix_group_1]
+host_1
+192.168.100.25
+host_3.your.domain  zabbix_add_templates='["Template 4"]'
+host_[4:10]
+host_11 ip=192.168.100.35
+
+[zabbix_hosts:children]
+zabbix_group_1
