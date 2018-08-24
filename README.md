@@ -1,4 +1,4 @@
-# zabbix-ansible
+# Добавление нового хоста в Zabbix, используя Ansible
 
 Ansible playbook для добавления хостов в Zabbix Server
 
